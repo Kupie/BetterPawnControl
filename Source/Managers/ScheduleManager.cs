@@ -73,7 +73,10 @@ namespace BetterPawnControl
                         link.area = p.playerSettings.AreaRestrictionInPawnCurrentMap;
                         if (p.timetable != null)
                         {
-                            ScheduleManager.CopySchedule(p.timetable.times, link.schedule);
+                            var cleanTimes = p.timetable.times
+                                .Select(t => IsPEStudySlot(t) ? TimeAssignmentDefOf.Anything : t)
+                                .ToList();
+                            ScheduleManager.CopySchedule(cleanTimes, link.schedule);
                         }
                     }
                     else
@@ -84,7 +87,11 @@ namespace BetterPawnControl
                                 activePolicyId,
                                 p,
                                 p.playerSettings.AreaRestrictionInPawnCurrentMap,
-                                p.timetable != null ? p.timetable.times : null,
+                                p.timetable != null
+                                    ? p.timetable.times
+                                        .Select(t => IsPEStudySlot(t) ? TimeAssignmentDefOf.Anything : t)
+                                        .ToList()
+                                    : null,
                                 currentMap));
                     }
                 }
@@ -95,6 +102,11 @@ namespace BetterPawnControl
                 }
 
             }
+        }
+
+        private static bool IsPEStudySlot(TimeAssignmentDef def)
+        {
+            return def != null && def.defName.StartsWith("PE_DynamicClass_");
         }
 
         internal static bool CopySchedule(List<TimeAssignmentDef> src, List<TimeAssignmentDef> dst)
@@ -114,8 +126,13 @@ namespace BetterPawnControl
                 }
             }
 
-            dst.Clear();
-            dst.AddRange(src);
+            for (var i = 0; i < dst.Count && i < src.Count; i++)
+            {
+                if (!IsPEStudySlot(dst[i]))
+                {
+                    dst[i] = src[i];
+                }
+            }
 
             return !isEquals;
         }

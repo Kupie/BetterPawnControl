@@ -32,8 +32,4 @@
     <Publicize Include="Assembly-CSharp:Verse.Pawn.Tick" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy E:\BetterPawnControl\Source\bin\Release\net472\BetterPawnControl.dll D:\Steam\steamapps\common\RimWorld\Mods\BetterPawnControl\v1.6\Assemblies\ /Y" />
-  </Target>
-
 </Project>
